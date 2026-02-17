@@ -1,24 +1,29 @@
-"use client";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import LoginButton from "./login-button";
 
-import { createClient } from "@/lib/supabase/client"
+async function HomeContent() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
+  return <LoginButton />;
+}
 
 export default function Home() {
-  const supabase = createClient();
-
-  const handleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-  };
-
   return (
-      <main className="flex items-center justify-center h-screen">
-        <button
-            onClick={handleLogin}
-            className="bg-black text-white px-6 py-3 rounded"
-        >
-          Sign in with Google
-        </button>
-      </main>
+    <main className="flex items-center justify-center h-screen">
+      <Suspense fallback={<div className="text-gray-500">Checking session...</div>}>
+        {/* runtime data access moved into HomeContent (async server component) */}
+        <HomeContent />
+      </Suspense>
+    </main>
   );
 }
