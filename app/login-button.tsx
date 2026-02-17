@@ -8,15 +8,18 @@ export default function LoginButton() {
     const handleLogin = async () => {
         await supabase.auth.signInWithOAuth({
             provider: "google",
+            options: {
+                redirectTo: `${location.origin}/dashboard`,
+            },
         });
     };
 
     return (
         <button
             onClick={handleLogin}
-            className="px-6 py-3 rounded bg-primary text-primary-foreground hover:opacity-90"
+            className="bg-black text-white px-6 py-3 rounded"
         >
-            Log in with Google
+            Sign in with Google
         </button>
     );
 }
